@@ -1,0 +1,8 @@
+{
+  "name": "config",
+  "packageManager": "yarn@3.6.0",
+  "dependencies": {
+    "@types/node": "^20.14.9",
+    "cypress": "^13.13.0"
+  }
+}

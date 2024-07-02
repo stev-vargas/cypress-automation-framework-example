@@ -1,0 +1,7 @@
+tests/cypress/.eslintrc.json
+tests/cypress/**/*.json
+
+config/**/*.js
+config/*.js
+
+scripts/*.js
