@@ -56,8 +56,6 @@ module.exports = {
     },
 
     rules: {
-        // NuORDER
-        // indent: [1, 4, { SwitchCase: 1, flatTernaryExpressions: true, ignoredNodes: ["ConditionalExpression"] }],
         "comma-dangle": ["error", "always-multiline"],
         "no-debugger": "warn",
         "no-console": "off",

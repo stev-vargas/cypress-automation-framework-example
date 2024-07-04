@@ -16,9 +16,12 @@
     "mocha-junit-reporter": "^2.2.1",
     "prettier": "^3.3.2",
     "typescript": "^5.5.3",
+    "typescript-eslint": "^7.15.0",
     "webpack": "^5.92.1"
   },
   "workspaces": [
-    "config"
+    "config",
+    "helpers",
+    "utils"
   ]
 }

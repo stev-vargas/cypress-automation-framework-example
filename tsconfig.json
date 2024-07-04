@@ -23,6 +23,7 @@
         "./*/**/jest.config.js",
         "./*/**/webpack.config.js",
         ".yarn",
-        "reporter.js"
+        "reporter.js",
+        "*.mjs"
     ]
 }

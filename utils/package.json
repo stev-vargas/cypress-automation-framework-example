@@ -1,0 +1,10 @@
+{
+    "name": "utils",
+    "packageManager": "yarn@3.6.0",
+    "dependencies": {
+        "@types/fs-extra": "^11.0.4",
+        "cypress": "^13.13.0",
+        "fs-extra": "^11.2.0",
+        "xlsx": "^0.18.5"
+    }
+}

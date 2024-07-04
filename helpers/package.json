@@ -1,0 +1,10 @@
+{
+    "name": "helpers",
+    "packageManager": "yarn@3.6.0",
+    "dependencies": {
+        "@types/node": "^20.14.9",
+        "@types/uuid": "^10.0.0",
+        "cypress": "^13.13.0",
+        "uuid": "^10.0.0"
+    }
+}
