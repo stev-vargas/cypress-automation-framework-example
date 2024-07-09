@@ -2,9 +2,23 @@
     "name": "utils",
     "packageManager": "yarn@3.6.0",
     "dependencies": {
+        "@cypress/xpath": "^2.0.3",
+        "@google-cloud/bigquery": "^7.8.0",
+        "@types/bluebird": "^3.5.42",
         "@types/fs-extra": "^11.0.4",
+        "@types/got": "^9.6.12",
+        "@types/jsonwebtoken": "^9.0.6",
+        "@types/lodash": "^4.17.6",
+        "@types/object-hash": "^3.0.6",
         "cypress": "^13.13.0",
+        "cypress-recurse": "^1.35.3",
+        "cypress-wait-until": "^3.0.1",
+        "exceljs": "^4.4.0",
         "fs-extra": "^11.2.0",
+        "got": "^14.4.1",
+        "jsonwebtoken": "^9.0.2",
+        "lodash": "^4.17.21",
+        "object-hash": "^3.0.0",
         "xlsx": "^0.18.5"
     }
 }

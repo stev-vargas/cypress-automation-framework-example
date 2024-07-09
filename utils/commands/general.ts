@@ -1,9 +1,6 @@
-/* eslint-disable cypress/no-unnecessary-waiting */
-// import _ from "lodash";
-// import { DATATEST } from "constants/integration";
-// import { Workbook } from "utils/custom/tasks";
-// import * as XLSX from "xlsx";
-// import { VerificationMode } from "app/pages/shared";
+
+import _ from "lodash";
+import * as XLSX from "xlsx";
 import "@4tw/cypress-drag-drop";
 
 declare global {
@@ -62,10 +59,7 @@ declare global {
              * Clears the current authentication cookies, i.e. the `cmsa` and the `rcmsa` cookies.
              */
             clearAuthCookies: () => Chainable;
-            /**
-             * Wait for the page loading animation to complete.
-             */
-            waitForLoadingPageAnimation: () => Chainable;
+
             /**
              * Press the escape key to clear out any open menus.
              */
@@ -156,12 +150,7 @@ declare global {
              * @returns array of matched product.
              */
             parsePdfWithRegExp(url: string, regexp: RegExp): Chainable;
-            /**
-             * Parses XLSX file from remote location.
-             * @param url redirect XLSX url.
-             * @returns workbook object.
-             */
-            getExcelWorkbook(url: string): Chainable<Workbook>;
+
             /**
              * Parses XLSX file from remote location and calculates hash value.
              * @param url redirect XLSX url.
@@ -192,28 +181,6 @@ declare global {
              * @param path file path.
              */
             verifyXlsxContainsHeadersOnly(path: string): Chainable;
-            /**
-             * Verify excel column Values
-             *
-             *  @param path file path.
-             *  @param columnName column name
-             *  @param expectedValues expected values
-             */
-            verifyExcelColumnValues(
-                path: string,
-                columnName: string,
-                expectedValues: any[],
-                mode?: VerificationMode,
-                log?: string
-            ): Chainable;
-
-            verifyExcelColumnIDValues(
-                path: string,
-                colID: any,
-                expectedValues: any[],
-                mode?: VerificationMode,
-                log?: string
-            ): Chainable;
 
             /**
              * return excel column Values
@@ -283,8 +250,8 @@ declare global {
             genCsv({
                 name,
                 data,
-                useCsvExtension = true,
-                useFixTuresTempDir = false,
+                useCsvExtension,
+                useFixTuresTempDir,
             }: {
                 name: string;
                 data: { [key: string]: string | number | boolean | undefined }[];
@@ -296,7 +263,7 @@ declare global {
                 name,
                 sheetName,
                 data,
-                useFixTuresTempDir = false,
+                useFixTuresTempDir,
             }: {
                 name: string;
                 sheetName?: string;
@@ -377,7 +344,7 @@ ADD("logSubStep", (message: string, extra: Record<string, any> = {}) =>
                 message,
             }),
         });
-    })
+    }),
 );
 
 ADD("extendCookieDomains", () => {
@@ -393,20 +360,6 @@ ADD("clearAuthCookies", () => {
     cy.logStep("Clearing Auth Cookies");
     cy.clearCookie("cmsa");
     return cy.clearCookie("rcmsa");
-});
-
-ADD("waitForLoadingPageAnimation", () => {
-    const shimmerLoader = DATATEST.NUORDER_SHIMMER_LOADER;
-    const getShimmerLoader = () => cy.getByDataTest(shimmerLoader);
-    return cy.get("body").then((body) => {
-        if (body.find(`[data-test=${shimmerLoader}]`).length) {
-            return getShimmerLoader()
-                .should("be.visible")
-                .then(() => getShimmerLoader().should("not.exist"));
-        } else {
-            return cy.dummy();
-        }
-    });
 });
 
 ADD("pressEscape", () => cy.xpath("//body").type("{esc}"));
@@ -500,7 +453,7 @@ ADD(
     "waitUntilNotDetached",
     (
         eleFn: () => Cypress.Chainable<JQuery<any>>,
-        options?: { timeout?: number; interval?: number; waitTime?: number }
+        options?: { timeout?: number; interval?: number; waitTime?: number },
     ) => {
         const timeout = options?.timeout ?? 1000;
         const interval = options?.interval ?? 10;
@@ -511,10 +464,10 @@ ADD(
                     eleFn()
                         .wait(waitTime)
                         .then(($ele) => Cypress.dom.isAttached($ele)),
-                { timeout, interval, log: false }
+                { timeout, interval, log: false },
             )
             .then(() => eleFn());
-    }
+    },
 );
 
 ADD("parsePdfWithRegExp", (url: string, regexp: RegExp) => {
@@ -525,12 +478,11 @@ ADD("parsePdfWithRegExp", (url: string, regexp: RegExp) => {
     });
 });
 
-ADD("getExcelWorkbook", (url: string) => cy.task("getWorkbookAfterPolling", url));
 
 ADD("getExcelHash", (url: string) => cy.task("getWorkbookHash", url));
 
 ADD("downloadFile", (url: string, path: string, isTempFile?: boolean) =>
-    cy.task("downloadFile", { url, path, isTempFile })
+    cy.task("downloadFile", { url, path, isTempFile }),
 );
 
 ADD("downloadFileWithTimeout", (url: string, path: string, timeout: number) => {
@@ -577,91 +529,6 @@ ADD("returnExcelColumnValues", (filePath: string, columnName: string) => {
     });
 });
 
-ADD(
-    "verifyExcelColumnValues",
-    (filePath: string, columnName: string, expectedValues: any[], mode?: VerificationMode, log?: string) => {
-        cy.readFile(filePath, "binary").then((fileContent) => {
-            const workbook = XLSX.read(fileContent, { type: "binary" });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]]; // Taking the first sheet
-            const columnData: string[] = [];
-            const range = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as (string | number)[][];
-            const headerRow = range[0];
-
-            const columnIndex = headerRow.findIndex((headerCell) => headerCell === columnName);
-            if (columnIndex === -1) {
-                throw new Error(`Column "${columnName}" not found.`);
-            }
-            for (let rowNum = 1; rowNum < range.length; rowNum++) {
-                const row = range[rowNum];
-                const cellValue = row[columnIndex] as string;
-                columnData.push(cellValue);
-            }
-
-            switch (mode) {
-                case VerificationMode.Equal:
-                    expect(columnData, log).to.eql(expectedValues);
-                    break;
-                case VerificationMode.Contains:
-                    expect(columnData, log).to.contains(expectedValues);
-                    break;
-                case VerificationMode.DeepContains:
-                    expect(columnData, log).to.deep.include.members(expectedValues);
-                    break;
-                case VerificationMode.Includes:
-                    expect(columnData, log).to.include.members(expectedValues);
-                    break;
-                case VerificationMode.NotContains:
-                    expect(columnData, log).to.not.include.members(expectedValues);
-                    break;
-                default:
-                    expect(columnData, log).to.deep.equal(expectedValues);
-                    break;
-            }
-        });
-    }
-);
-
-ADD(
-    "verifyExcelColumnIDValues",
-    (filePath: string, colID: any, expectedValues: any[], mode?: VerificationMode, log?: string) => {
-        cy.readFile(filePath, "binary").then((fileContent) => {
-            const workbook = XLSX.read(fileContent, { type: "binary" });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]]; // Taking the first sheet
-            const columnData: string[] = [];
-            const range = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as (string | number)[][];
-
-            for (let rowNum = 1; rowNum < range.length; rowNum++) {
-                const row = range[rowNum];
-                const cellValue = row[colID] as string; // Get the value from the first column (index 0)
-                if (cellValue !== undefined) {
-                    columnData.push(cellValue.replace(/\s\s+/g, " "));
-                }
-            }
-
-            switch (mode) {
-                case VerificationMode.Equal:
-                    expect(columnData, log).to.eql(expectedValues);
-                    break;
-                case VerificationMode.Contains:
-                    expect(columnData, log).to.contains(expectedValues);
-                    break;
-                case VerificationMode.DeepContains:
-                    expect(columnData, log).to.deep.include.members(expectedValues);
-                    break;
-                case VerificationMode.Includes:
-                    expect(columnData, log).to.include.members(expectedValues);
-                    break;
-                case VerificationMode.NotContains:
-                    expect(columnData, log).to.not.include.members(expectedValues);
-                    break;
-                default:
-                    expect(columnData, log).to.deep.equal(expectedValues);
-                    break;
-            }
-        });
-    }
-);
-
 ADD("getClipboardValue", (): Cypress.Chainable<string> => {
     let clipValue: string;
 
@@ -674,14 +541,14 @@ ADD("getClipboardValue", (): Cypress.Chainable<string> => {
                         permissions: ["clipboardReadWrite", "clipboardSanitizedWrite"],
                         origin: window.location.origin,
                     },
-                })
+                }),
             )
             .then(() =>
                 cy.window().then((win) => {
                     return win.navigator.clipboard.readText().then((text) => {
                         clipValue = text;
                     });
-                })
+                }),
             );
 
     return getClipboard().then(() => cy.wrapNoLog(clipValue));
@@ -741,7 +608,7 @@ ADD("waitForLoadingCircle", (loadingCircleType: "svg" | "css" | "msg" = "svg", d
             break;
     }
     const circle = () => cy.xpath(path);
-    // eslint-disable-next-line cypress/no-unnecessary-waiting
+
     return cy.wait(delay).waitUntil(
         () =>
             circle()
@@ -749,7 +616,7 @@ ADD("waitForLoadingCircle", (loadingCircleType: "svg" | "css" | "msg" = "svg", d
                 .then((c) => !c.is(":visible")),
         {
             customMessage: "Loading completed",
-        }
+        },
     );
 });
 
@@ -786,7 +653,7 @@ ADD("setDelayAndTimeout", (delay?: number, throttle?: number) => {
                         res.setThrottle(throttle);
                     }
                 });
-            }
+            },
         )
         .as(`Delay:${delay ?? 0}ms|Throttle:${throttle ?? 0}Mbps`);
 });
@@ -849,5 +716,5 @@ ADD("stubBeforeUnload", () =>
             return result;
         };
         win.addEventListener("beforeunload", ourCallback);
-    })
+    }),
 );
