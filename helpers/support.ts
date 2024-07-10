@@ -1,6 +1,10 @@
+import "utils/commands/general";
+import "utils/commands/bigquery";
+import "utils/commands/network";
+import "utils/commands/recursion";
 import { getEnv } from "./general/config.helper";
 import "@cypress/xpath";
-import { fromMinutes, getTimeText, testTimeout } from "./timeouts";
+import { fromMinutes, getTimeText, testTimeout } from "./general/timeouts";
 
 export function setupCypressHooks() {
     const env = getEnv();

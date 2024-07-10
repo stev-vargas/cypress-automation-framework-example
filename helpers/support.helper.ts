@@ -1,6 +1,5 @@
-import { CypressEnvConfig } from "config/cypress/schema";
 import { getEnv } from "./general/config.helper";
-import { fromMinutes, getTimeText, testTimeout } from "./general/timeout";
+import { fromMinutes, getTimeText, testTimeout } from "./general/timeouts";
 import "utils/custom/commands/shared-commands";
 import "utils/custom/commands/drive-commands";
 import "utils/custom/commands/drag-and-drop";
@@ -40,14 +39,6 @@ export function setupCypressHooks() {
     });
 }
 
-export function throttleAndDelayRequests(env: CypressEnvConfig) {
-    const delay = env.responseDelay;
-    const throttle = env.responseThrottle;
-    if (delay || throttle) {
-        cy.setDelayAndTimeout(delay, throttle);
-    }
-}
-
 export function setupSpecTimeout(start: number) {
     const timeout = fromMinutes(15);
     const now = +new Date();
@@ -59,7 +50,6 @@ export function clearInterceptsAndCookiesAndSessions() {
     cy.intercept("**", (req) => {
         req.continue();
     });
-    cy.clearLoginSessions();
 }
 
 export function getStart() {

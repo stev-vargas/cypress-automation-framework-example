@@ -2036,6 +2036,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"e2e_demo@workspace:e2e/demo":
+  version: 0.0.0-use.local
+  resolution: "e2e_demo@workspace:e2e/demo"
+  dependencies:
+    "@types/node": ^20.14.10
+    cypress: ^13.13.0
+    cypress-downloadfile: ^1.2.4
+    cypress-file-upload: ^5.0.8
+    cypress-real-events: ^1.13.0
+    cypress-recurse: ^1.35.3
+    cypress-wait-until: ^3.0.1
+  languageName: unknown
+  linkType: soft
+
 "ecc-jsbn@npm:~0.1.1":
   version: 0.1.2
   resolution: "ecc-jsbn@npm:0.1.2"

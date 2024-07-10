@@ -24,6 +24,7 @@
     "config",
     "helpers",
     "utils",
-    "app"
+    "app",
+    "e2e/*"
   ]
 }

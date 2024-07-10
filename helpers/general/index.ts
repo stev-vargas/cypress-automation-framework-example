@@ -5,4 +5,4 @@ export * from "./random-data.helper";
 export * from "./svg.helper";
 export * from "./test-title.helper";
 export * from "./theory-testcase.helper";
-export * from "../timeouts";
+export * from "./timeouts";
